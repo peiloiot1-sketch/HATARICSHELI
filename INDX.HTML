@@ -1,0 +1,810 @@
+```html
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>גלה את התאריך - מידע היסטורי ועברי</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark Theme Styles (Default) */
+        body.theme-dark {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+        }
+        .theme-dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .theme-dark .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .theme-dark .text-title {
+            color: #f8fafc;
+        }
+        .theme-dark .text-muted {
+            color: #94a3b8;
+        }
+        .theme-dark .input-bg {
+            background-color: rgba(15, 23, 42, 0.8);
+            border-color: #334155;
+            color: #ffffff;
+        }
+        .theme-dark .list-item-bg {
+            background-color: rgba(15, 23, 42, 0.4);
+            border-color: rgba(51, 65, 85, 0.8);
+        }
+        .theme-dark .list-item-bg:hover {
+            background-color: rgba(15, 23, 42, 0.7);
+        }
+
+        /* Light Theme Styles */
+        body.theme-light {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #0f172a;
+        }
+        .theme-light .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        .theme-light .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 28px -5px rgba(99, 102, 241, 0.15);
+        }
+        .theme-light .text-title {
+            color: #0f172a;
+        }
+        .theme-light .text-muted {
+            color: #475569;
+        }
+        .theme-light .input-bg {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+        .theme-light .list-item-bg {
+            background-color: rgba(241, 245, 249, 0.9);
+            border-color: #cbd5e1;
+        }
+        .theme-light .list-item-bg:hover {
+            background-color: #ffffff;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.1);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 custom-scrollbar theme-dark">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Top Bar with Theme Switcher -->
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-indigo-500">תאריכון היסטורי</span>
+            </div>
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" id="themeToggleBtn" class="flex items-center gap-2 px-4 py-2 rounded-2xl glass-card text-sm font-medium hover:scale-105 transition transform active:scale-95 cursor-pointer">
+                <i id="themeIcon" class="fa-solid fa-moon text-indigo-400"></i>
+                <span id="themeText">מצב כהה</span>
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center space-y-3 py-2">
+            <div class="inline-flex items-center justify-center p-3 bg-indigo-600/20 text-indigo-400 rounded-2xl mb-2 border border-indigo-500/30">
+                <i class="fa-solid fa-calendar-star text-3xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                גלה את התאריך שלך
+            </h1>
+            <p class="text-muted text-base md:text-lg max-w-2xl mx-auto">
+                הכנס תאריך וקבל את התאריך העברי, אירועים היסטוריים, מפורסמים שנולדו ונפטרו, מזל המזלות ועוד.
+            </p>
+        </header>
+
+        <!-- Date Input Bar -->
+        <div class="glass-card p-4 md:p-6 rounded-3xl shadow-2xl max-w-xl mx-auto border border-indigo-500/20">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-calendar-days absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input type="date" id="dateInput" class="w-full input-bg rounded-2xl pr-12 pl-4 py-3.5 outline-none border focus:border-indigo-500 transition text-lg">
+                </div>
+                <button onclick="fetchDateData()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-indigo-500/30 transition transform active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>חפש</span>
+                </button>
+            </div>
+            <!-- Quick Actions -->
+            <div class="flex items-center justify-center gap-3 mt-4 text-sm text-muted">
+                <span>תאריכים מהירים:</span>
+                <button onclick="setToday()" class="hover:text-indigo-500 underline decoration-indigo-500/50">היום</button>
+                <span>•</span>
+                <button onclick="setRandomDate()" class="hover:text-indigo-500 underline decoration-indigo-500/50">תאריך אקראי</button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="contentArea" class="hidden space-y-6">
+
+            <!-- Overview Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Hebrew Date Box -->
+                <div class="glass-card glass-card-hover p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -left-4 -top-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+                    <div>
+                        <div class="flex items-center justify-between text-indigo-500 mb-3">
+                            <span class="text-sm font-semibold tracking-wider uppercase">לוח עברי</span>
+                            <i class="fa-solid fa-scroll text-xl"></i>
+                        </div>
+                        <h2 id="hebrewDate" class="text-2xl font-bold text-title mb-1">...</h2>
+                        <p id="hebrewParsha" class="text-sm text-indigo-400 font-medium"></p>
+                    </div>
+                    <div id="hebrewEventsBadge" class="mt-4 pt-3 border-t border-slate-500/20 text-xs text-amber-500 font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-star text-xs"></i>
+                        <span id="hebrewEventsText">אין מועד עברי מיוחד</span>
+                    </div>
+                </div>
+
+                <!-- Zodiac Box -->
+                <div class="glass-card glass-card-hover p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -left-4 -top-4 w-24 h-24 bg-purple-500/10 rounded-full blur-xl"></div>
+                    <div>
+                        <div class="flex items-center justify-between text-purple-500 mb-3">
+                            <span class="text-sm font-semibold tracking-wider uppercase">אסטרולוגיה ומזל</span>
+                            <i class="fa-solid fa-sparkles text-xl"></i>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="zodiacIcon" class="text-4xl">✨</span>
+                            <div>
+                                <h2 id="zodiacName" class="text-2xl font-bold text-title">...</h2>
+                                <p id="zodiacDates" class="text-xs text-muted"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="zodiacElement" class="mt-4 pt-3 border-t border-slate-500/20 text-xs text-purple-500 font-medium">
+                        יסוד: <span id="zodiacElementVal">...</span>
+                    </p>
+                </div>
+
+                <!-- Day Details Box -->
+                <div class="glass-card glass-card-hover p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -left-4 -top-4 w-24 h-24 bg-pink-500/10 rounded-full blur-xl"></div>
+                    <div>
+                        <div class="flex items-center justify-between text-pink-500 mb-3">
+                            <span class="text-sm font-semibold tracking-wider uppercase">פרטי היממה</span>
+                            <i class="fa-solid fa-clock text-xl"></i>
+                        </div>
+                        <h2 id="dayOfWeek" class="text-2xl font-bold text-title mb-1">...</h2>
+                        <p id="dayOfYear" class="text-xs text-muted"></p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-500/20 flex justify-between text-xs text-muted">
+                        <span>שנה מעוברת: <strong id="isLeapYear" class="text-title">...</strong></span>
+                        <span>יום בשנה: <strong id="dayNumber" class="text-title">...</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Tabs Content -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-500/20 shadow-xl">
+                
+                <!-- Navigation Tabs & Search & Era Filter -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between border-b border-slate-500/20 mb-6 gap-4 pb-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="switchTab('events')" id="tab-events" class="tab-btn active border-b-2 border-indigo-500 text-indigo-500 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-landmark"></i>
+                            <span>אירועים היסטוריים (<span id="count-events">0</span>)</span>
+                        </button>
+                        <button onclick="switchTab('births')" id="tab-births" class="tab-btn text-muted hover:text-indigo-500 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-cake-candles"></i>
+                            <span>נולדו בתאריך זה (<span id="count-births">0</span>)</span>
+                        </button>
+                        <button onclick="switchTab('deaths')" id="tab-deaths" class="tab-btn text-muted hover:text-indigo-500 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-ribbon"></i>
+                            <span>נפטרו בתאריך זה (<span id="count-deaths">0</span>)</span>
+                        </button>
+                        <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn text-muted hover:text-indigo-500 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i>
+                            <span>טריוויה יומית</span>
+                        </button>
+                    </div>
+
+                    <!-- Search Filter & Century/Era Dropdown -->
+                    <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                        <!-- Era / Century Filter -->
+                        <select id="eraSelect" onchange="filterCurrentList()" class="input-bg text-xs rounded-xl px-3 py-2 border focus:border-indigo-500 outline-none cursor-pointer">
+                            <option value="all">כל התקופות והמאות</option>
+                            <option value="ancient">העת העתיקה וימי הביניים (עד 1500)</option>
+                            <option value="early_modern">העת החדשה (1500 - 1899)</option>
+                            <option value="20th">המאה ה-20 (1900 - 1999)</option>
+                            <option value="21st">המאה ה-21 (2000 והלאה)</option>
+                        </select>
+
+                        <!-- Text Search Filter -->
+                        <div class="relative w-full sm:w-48">
+                            <i class="fa-solid fa-filter absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchInput" oninput="filterCurrentList()" placeholder="חיפוש חופשי..." class="w-full input-bg text-xs rounded-xl pr-8 pl-3 py-2 border focus:border-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Panels -->
+                <!-- Events -->
+                <div id="panel-events" class="tab-panel space-y-4">
+                    <div id="eventsList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Births -->
+                <div id="panel-births" class="tab-panel hidden space-y-4">
+                    <div id="birthsList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Deaths -->
+                <div id="panel-deaths" class="tab-panel hidden space-y-4">
+                    <div id="deathsList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Quiz Panel -->
+                <div id="panel-quiz" class="tab-panel hidden space-y-4 text-center py-6">
+                    <div id="quizContainer" class="max-w-md mx-auto space-y-4 input-bg p-6 rounded-2xl border">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Detail Modal with AI Image Generator -->
+        <div id="eventModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-card max-w-lg w-full rounded-3xl p-6 border border-indigo-500/30 relative space-y-5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <button onclick="closeModal()" class="absolute top-4 left-4 text-muted hover:text-title text-xl p-2 rounded-full hover:bg-indigo-500/10 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                
+                <div class="flex items-center gap-3 text-indigo-500">
+                    <i id="modalIcon" class="fa-solid fa-sparkles text-2xl"></i>
+                    <span id="modalCategory" class="text-sm font-semibold uppercase tracking-wider">אירוע היסטורי</span>
+                </div>
+
+                <p id="modalText" class="text-lg text-title font-medium leading-relaxed"></p>
+
+                <!-- Generated Image Box -->
+                <div id="aiImageBox" class="hidden space-y-3">
+                    <div class="relative w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 aspect-video flex items-center justify-center">
+                        <img id="aiGeneratedImg" src="" alt="תמונה שנוצרה ב-AI" class="w-full h-full object-cover">
+                        <div id="aiImageLoader" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center space-y-2">
+                            <div class="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
+                            <span class="text-xs text-indigo-300">יוצר תמונה ייחודית בעזרת AI...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-500/20">
+                    <button id="generateImgBtn" onclick="generateAiImageForCurrentModal()" class="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>צור תמונה ב-AI</span>
+                    </button>
+                    <button onclick="copyModalContent()" class="py-3 px-4 input-bg hover:border-indigo-500 text-title text-sm font-medium rounded-xl flex items-center justify-center gap-2 transition cursor-pointer">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>העתק טקסט</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loader State -->
+        <div id="loader" class="hidden text-center py-16">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+            <p class="mt-4 text-muted">טוען נתונים היסטוריים ועבריים...</p>
+        </div>
+
+        <!-- Empty / Initial State -->
+        <div id="emptyState" class="text-center py-16 glass-card rounded-3xl">
+            <i class="fa-solid fa-calendar-check text-6xl text-slate-400 mb-4"></i>
+            <h3 class="text-xl font-bold text-title">בחר תאריך כדי להתחיל</h3>
+            <p class="text-muted text-sm mt-1">תוכל לבחור תאריך מהיומן או ללחוץ על "היום" או "תאריך אקראי"</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Global storage for loaded data & theme state
+        let currentWikiData = { events: [], births: [], deaths: [] };
+        let activeTabName = 'events';
+        let currentModalItem = { text: '', category: '', icon: '', year: null };
+        let isDarkMode = true;
+
+        // Theme Switcher Logic
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (isDarkMode) {
+                body.classList.remove('theme-light');
+                body.classList.add('theme-dark');
+                themeIcon.className = 'fa-solid fa-moon text-indigo-400';
+                themeText.textContent = 'מצב כהה';
+            } else {
+                body.classList.remove('theme-dark');
+                body.classList.add('theme-light');
+                themeIcon.className = 'fa-solid fa-sun text-amber-500';
+                themeText.textContent = 'מצב בהיר';
+            }
+        }
+
+        // Set today date by default on page load
+        window.onload = function() {
+            setToday();
+        };
+
+        function setToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            fetchDateData();
+        }
+
+        function setRandomDate() {
+            const start = new Date(1900, 0, 1);
+            const end = new Date(2025, 11, 31);
+            const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            const formatted = randomDate.toISOString().split('T')[0];
+            document.getElementById('dateInput').value = formatted;
+            fetchDateData();
+        }
+
+        async function fetchDateData() {
+            const inputVal = document.getElementById('dateInput').value;
+            if (!inputVal) return;
+
+            const [year, month, day] = inputVal.split('-').map(Number);
+            const selectedDate = new Date(year, month - 1, day);
+
+            // Show Loader
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('contentArea').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+
+            try {
+                // Run Hebcal API & Wikipedia API in parallel
+                const [hebcalData, wikiData] = await Promise.all([
+                    getHebcalData(year, month, day),
+                    getWikipediaData(month, day)
+                ]);
+
+                currentWikiData = wikiData;
+
+                // Update counts on tab headers
+                document.getElementById('count-events').textContent = wikiData.events.length;
+                document.getElementById('count-births').textContent = wikiData.births.length;
+                document.getElementById('count-deaths').textContent = wikiData.deaths.length;
+
+                // Update Overview Section
+                updateOverview(selectedDate, hebcalData);
+
+                // Update History Tabs
+                updateHistoryTabs(wikiData);
+
+                // Prepare Trivia
+                setupTriviaGame(wikiData);
+
+                // Display main content
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('contentArea').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('loader').classList.add('hidden');
+                alert("אירעה שגיאה בטעינת הנתונים. אנא נסה שוב.");
+            }
+        }
+
+        // --- HEBCAL API FETCH ---
+        async function getHebcalData(year, month, day) {
+            const url = `https://www.hebcal.com/converter?cfg=json&gy=${year}&gm=${month}&gd=${day}&g2h=1`;
+            const response = await fetch(url);
+            return await response.json();
+        }
+
+        // --- ENHANCED WIKIPEDIA API FETCH (Hebrew Wikipedia Date Page) ---
+        async function getWikipediaData(month, day) {
+            const hebrewMonths = [
+                "בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני",
+                "ביולי", "באוגוסט", "בספטמבר", "באוקטובר", "בנובמבר", "בדצמבר"
+            ];
+            const monthName = hebrewMonths[month - 1];
+            const title = `${day}_${monthName}`;
+
+            try {
+                const pageUrl = `https://he.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
+                const res = await fetch(pageUrl);
+                const data = await res.json();
+                
+                if (data.parse && data.parse.text) {
+                    return parseWikipediaHtml(data.parse.text['*']);
+                }
+                return { events: [], births: [], deaths: [] };
+            } catch (err) {
+                console.warn("Could not fetch Hebrew wikipedia data:", err);
+                return { events: [], births: [], deaths: [] };
+            }
+        }
+
+        // Enhanced HTML Parser for Wikipedia Date Page extracting year & eras across history
+        function parseWikipediaHtml(htmlText) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+
+            const result = {
+                events: [],
+                births: [],
+                deaths: []
+            };
+
+            let currentCategory = 'events';
+
+            // Extract content from main sections
+            const elements = doc.querySelectorAll('h2, h3, ul');
+            
+            elements.forEach(el => {
+                if (el.tagName === 'H2' || el.tagName === 'H3') {
+                    const text = el.textContent || '';
+                    if (text.includes('אירועים')) currentCategory = 'events';
+                    else if (text.includes('נולדו')) currentCategory = 'births';
+                    else if (text.includes('נפטרו')) currentCategory = 'deaths';
+                } else if (el.tagName === 'UL') {
+                    const items = el.querySelectorAll('li');
+                    items.forEach(li => {
+                        const cleanText = li.textContent.replace(/\[\d+\]/g, '').replace(/\[דרוש מקור\]/g, '').trim();
+                        if (cleanText.length > 5 && result[currentCategory]) {
+                            // Extract year if present at the start of entry (e.g. "1948 - הכרזת העצמאות")
+                            const yearMatch = cleanText.match(/^(\d{1,4})\s*[-–]/);
+                            const year = yearMatch ? parseInt(yearMatch[1], 10) : null;
+
+                            result[currentCategory].push({
+                                text: cleanText,
+                                year: year
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Sort each category chronologically by year if available
+            ['events', 'births', 'deaths'].forEach(cat => {
+                result[cat].sort((a, b) => {
+                    if (a.year && b.year) return a.year - b.year;
+                    if (a.year) return -1;
+                    if (b.year) return 1;
+                    return 0;
+                });
+            });
+
+            return result;
+        }
+
+        // --- UPDATE OVERVIEW CARDS ---
+        function updateOverview(date, hebcal) {
+            document.getElementById('hebrewDate').textContent = hebcal.hebrew || 'לא זמין';
+            
+            if (hebcal.events && hebcal.events.length > 0) {
+                document.getElementById('hebrewEventsText').textContent = hebcal.events.join(', ');
+            } else {
+                document.getElementById('hebrewEventsText').textContent = 'אין חג או מועד מיוחד בתאריך עברי זה';
+            }
+
+            const daysOfWeek = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+            document.getElementById('dayOfWeek').textContent = `יום ${daysOfWeek[date.getDay()]}`;
+
+            const zodiac = getZodiacSign(date.getMonth() + 1, date.getDate());
+            document.getElementById('zodiacName').textContent = zodiac.name;
+            document.getElementById('zodiacIcon').textContent = zodiac.icon;
+            document.getElementById('zodiacDates').textContent = zodiac.range;
+            document.getElementById('zodiacElementVal').textContent = zodiac.element;
+
+            const year = date.getFullYear();
+            const startOfYear = new Date(year, 0, 0);
+            const diff = date - startOfYear;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayNum = Math.floor(diff / oneDay);
+            
+            document.getElementById('dayNumber').textContent = `${dayNum} מתוך ${isLeapYear(year) ? 366 : 365}`;
+            document.getElementById('dayOfYear').textContent = `שנת ${year}`;
+            document.getElementById('isLeapYear').textContent = isLeapYear(year) ? 'כן' : 'לא';
+        }
+
+        // --- UPDATE TABS CONTENT ---
+        function updateHistoryTabs(wikiData) {
+            renderList('eventsList', wikiData.events, 'fa-landmark', 'אירוע היסטורי', 'לא נמצאו אירועים היסטוריים לתאריך זה');
+            renderList('birthsList', wikiData.births, 'fa-cake-candles', 'נולד/ה בתאריך זה', 'לא נמצאו נתונים על מפורסמים שנולדו בתאריך זה');
+            renderList('deathsList', wikiData.deaths, 'fa-ribbon', 'נפטר/ה בתאריך זה', 'לא נמצאו נתונים על מפורסמים שנפטרו בתאריך זה');
+        }
+
+        function renderList(containerId, items, iconClass, categoryName, emptyMessage) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-muted">
+                        <p>${emptyMessage}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(itemObj => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex items-start gap-3 p-3 list-item-bg rounded-xl border hover:border-indigo-500/50 transition cursor-pointer group";
+                
+                itemDiv.onclick = () => openModal(itemObj.text, categoryName, iconClass, itemObj.year);
+
+                const yearBadge = itemObj.year 
+                    ? `<span class="px-2 py-0.5 text-xs font-bold rounded-md bg-indigo-500/20 text-indigo-500 border border-indigo-500/30 shrink-0">${itemObj.year}</span>`
+                    : '';
+
+                itemDiv.innerHTML = `
+                    <div class="p-2 bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-600 group-hover:text-white rounded-lg mt-0.5 shrink-0 transition">
+                        <i class="fa-solid ${iconClass}"></i>
+                    </div>
+                    <div class="flex-1 flex justify-between items-center gap-3">
+                        <p class="text-sm text-title leading-relaxed">${escapeHtml(itemObj.text)}</p>
+                        ${yearBadge}
+                        <i class="fa-solid fa-chevron-left text-xs text-slate-400 group-hover:text-indigo-500 transition shrink-0"></i>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // --- FILTERING (TEXT + ERA/CENTURY) ---
+        function filterCurrentList() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const era = document.getElementById('eraSelect').value;
+            if (activeTabName === 'quiz') return;
+
+            const items = currentWikiData[activeTabName] || [];
+
+            const filtered = items.filter(itemObj => {
+                // Text Search Filter
+                const matchesText = itemObj.text.toLowerCase().includes(query);
+                
+                // Era Filter
+                let matchesEra = true;
+                if (era !== 'all') {
+                    const year = itemObj.year;
+                    if (!year) matchesEra = false;
+                    else if (era === 'ancient') matchesEra = year < 1500;
+                    else if (era === 'early_modern') matchesEra = year >= 1500 && year < 1900;
+                    else if (era === '20th') matchesEra = year >= 1900 && year < 2000;
+                    else if (era === '21st') matchesEra = year >= 2000;
+                }
+
+                return matchesText && matchesEra;
+            });
+
+            const categoryNames = { events: 'אירוע היסטורי', births: 'נולד/ה בתאריך זה', deaths: 'נפטר/ה בתאריך זה' };
+            const iconClasses = { events: 'fa-landmark', births: 'fa-cake-candles', deaths: 'fa-ribbon' };
+
+            renderList(
+                `${activeTabName}List`,
+                filtered,
+                iconClasses[activeTabName],
+                categoryNames[activeTabName],
+                'לא נמצאו תוצאות התואמות לחיפוש/סינון שנבחר'
+            );
+        }
+
+        // --- MODAL & AI IMAGE GENERATION ---
+        function openModal(text, category, icon, year) {
+            currentModalItem = { text, category, icon, year };
+            
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modalCategory').textContent = year ? `${category} (${year})` : category;
+            
+            const modalIconEl = document.getElementById('modalIcon');
+            modalIconEl.className = `fa-solid ${icon} text-2xl`;
+
+            // Reset image box
+            document.getElementById('aiImageBox').classList.add('hidden');
+            document.getElementById('aiGeneratedImg').src = '';
+
+            document.getElementById('eventModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').classList.add('hidden');
+        }
+
+        async function generateAiImageForCurrentModal() {
+            const imageBox = document.getElementById('aiImageBox');
+            const loader = document.getElementById('aiImageLoader');
+            const imgEl = document.getElementById('aiGeneratedImg');
+            const btn = document.getElementById('generateImgBtn');
+
+            imageBox.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            imgEl.src = '';
+            btn.disabled = true;
+
+            const yearContext = currentModalItem.year ? ` in year ${currentModalItem.year}` : '';
+            const prompt = `A detailed historical artwork, realistic painting or illustration depicting the historical event: ${currentModalItem.text}${yearContext}. High quality, cinematic lighting, accurate era details.`;
+
+            try {
+                const apiKey = ""; // Canvas runtime automatically supplies API key
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            responseModalities: ['IMAGE'],
+                            imageConfig: { aspectRatio: "16:9" }
+                        }
+                    })
+                });
+
+                const result = await response.json();
+                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                if (base64Data) {
+                    imgEl.src = `data:image/png;base64,${base64Data}`;
+                    loader.classList.add('hidden');
+                } else {
+                    alert('לא ניתן היה ליצור תמונה כעת. נסה שנית.');
+                    imageBox.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("AI Image Generation failed:", err);
+                alert('אירעה שגיאה ביצירת התמונה');
+                imageBox.classList.add('hidden');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function copyModalContent() {
+            const yearStr = currentModalItem.year ? ` (${currentModalItem.year})` : '';
+            const textToCopy = `${currentModalItem.category}${yearStr}:\n${currentModalItem.text}`;
+            const tempInput = document.createElement("textarea");
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("הטקסט הועתק ללוח!");
+        }
+
+        // --- TRIVIA MINI GAME ---
+        function setupTriviaGame(wikiData) {
+            const container = document.getElementById('quizContainer');
+            const allItems = [...wikiData.events, ...wikiData.births];
+
+            if (allItems.length < 3) {
+                container.innerHTML = `
+                    <i class="fa-solid fa-brain text-4xl text-slate-600 mb-2"></i>
+                    <p class="text-slate-400 text-sm">אין מספיק אירועים בתאריך זה כדי ליצור חידון טריוויה.</p>
+                `;
+                return;
+            }
+
+            // Pick a random event
+            const randomEventObj = allItems[Math.floor(Math.random() * allItems.length)];
+            const eventText = randomEventObj.text;
+            
+            container.innerHTML = `
+                <div class="text-indigo-400 font-bold text-sm uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-circle-question ml-1"></i> שאלת טריוויה היסטורית
+                </div>
+                <h4 class="text-slate-200 text-base font-medium mb-4">מה קרה בתאריך שנבחר?</h4>
+                <p class="text-sm text-indigo-200 bg-indigo-950/40 p-4 rounded-xl border border-indigo-500/20 italic">
+                    "${escapeHtml(eventText)}"
+                </p>
+                <div class="pt-3">
+                    <button onclick="openModal('${escapeHtml(eventText).replace(/'/g, "\\'")}', 'אירוע טריוויה', 'fa-lightbulb', ${randomEventObj.year || 'null'})" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition shadow-lg">
+                        פתח את התשובה והצג תמונה 🎨
+                    </button>
+                </div>
+            `;
+        }
+
+        // --- TAB SWITCHING LOGIC ---
+        function switchTab(tabName) {
+            activeTabName = tabName;
+            
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn text-slate-400 hover:text-slate-200 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2";
+            });
+
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            activeTab.className = "tab-btn active border-b-2 border-indigo-500 text-indigo-400 font-semibold px-4 py-2 rounded-t-lg transition flex items-center gap-2";
+
+            // Apply existing filter if any
+            filterCurrentList();
+        }
+
+        // --- ZODIAC CALCULATOR HELPER ---
+        function getZodiacSign(month, day) {
+            const signs = [
+                { name: "גדי", icon: "♑", range: "22 בדצמבר - 19 בינואר", element: "אדמה" },
+                { name: "דלי", icon: "♒", range: "20 בינואר - 18 בפברואר", element: "אוויר" },
+                { name: "דגים", icon: "♓", range: "19 בפברואר - 20 במרץ", element: "מים" },
+                { name: "טלה", icon: "♈", range: "21 במרץ - 19 באפריל", element: "אש" },
+                { name: "שור", icon: "♉", range: "20 באפריל - 20 במאי", element: "אדמה" },
+                { name: "תאומים", icon: "♊", range: "21 במאי - 20 ביוני", element: "אוויר" },
+                { name: "סרטן", icon: "♋", range: "21 ביוני - 22 ביולי", element: "מים" },
+                { name: "אריה", icon: "♌", range: "23 ביולי - 22 באוגוסט", element: "אש" },
+                { name: "בתולה", icon: "♍", range: "23 באוגוסט - 22 בספטמבר", element: "אדמה" },
+                { name: "מאזניים", icon: "♎", range: "23 בספטמבר - 22 באוקטובר", element: "אוויר" },
+                { name: "עקרב", icon: "♏", range: "23 באוקטובר - 21 בנובמבר", element: "מים" },
+                { name: "קשת", icon: "♐", range: "22 בנובמבר - 21 בדצמבר", element: "אש" }
+            ];
+
+            if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return signs[0];
+            if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return signs[1];
+            if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return signs[2];
+            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return signs[3];
+            if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return signs[4];
+            if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return signs[5];
+            if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return signs[6];
+            if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return signs[7];
+            if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return signs[8];
+            if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return signs[9];
+            if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return signs[10];
+            return signs[11];
+        }
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+```
